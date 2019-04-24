@@ -1,0 +1,110 @@
+PROCEDURE lay_bc_sucotb_daxuly2(
+        vdonvi_id IN NUMBER, --Don cha:  loai donvi =2 : don vi quan ly
+        vthang   in varchar,       -- yyyyMM
+        vtungay IN VARCHAR, --dd/MM/yyyy
+        vdenngay IN VARCHAR, --dd/MM/yyyy
+        vdichvuvt_id IN NUMBER,
+        vloaitb_id IN NUMBER,
+        vreturn   OUT refcursor
+    ) IS
+
+       str       varchar2(32767);
+       vcount    number(5);
+       str_dbtb  varchar2(100);
+       vthangbc  varchar2(100);
+
+    BEGIN
+        if (vthang <> '0') then
+           vthangbc := vthang;
+        else
+            vthangbc :='';
+        --  vthangbc := to_char(to_date(vtungay,'dd/MM/YYYY'),'yyyyMM');
+        end if;
+
+
+        vthangbc := vthangbc||'01';
+        str :='';
+        str :='select nvl(count(1),0) ';
+        str := str || ' from all_tables ';
+        str := str || ' where owner=''TINHCUOC_LCI'' and upper(table_name)=upper(''dbtb_'|| vthangbc ||''')';
+        EXECUTE IMMEDIATE str into vcount;
+
+        if vcount > 0 then
+            str_dbtb :=  'TINHCUOC_LCI'||'.dbtb_'||vthangbc;
+        else
+            str_dbtb := 'CSS_LCI'||'.db_thuebao';
+        end if;
+
+        --Lay danh sach su co thue bao da xu ly: lay nhung phieu da hoan thanh
+        str:='';
+                str:=str||' Select distinct * From (';
+        str:=str||' SELECT  DISTINCT donvi_id,baohong_id,ten_dv,ten_dt,ten_tb,diachi_tb,diachi_ld,somay,ten_dvvt, ';
+        str:=str||'         ngay_tiepnhan,gio_tiepnhan,ngay_xuly ngay_xuly,gio_xuly,tg_khacphuc, ';
+        str:=str||'          (SELECT TO_CHAR(SUBSTR(wm_concat(ten_nv), 0, 200)) ';
+        str:=str||'           FROM admin_LCI.nhanvien a,baohong_LCI.giaophieu_nv b ';
+        str:=str||'           WHERE a.nhanvien_id = b.nhanvien_th_id ';
+        str:=str||'           AND phieu_id = bh_dai.phieu_id)nguoi_xuly, ';
+        str:=str||'           (SELECT TO_CHAR(SUBSTR(wm_concat(TO_CHAR(ngaygiao, ''dd/MM/yyyy hh24:mi:ss'')), 0, 200))';
+        str:=str||'           FROM baohong_LCI.giaophieu_nv b ';
+        str:=str||'           WHERE phieu_id = bh_dai.phieu_id) ngaygiao_xl,';
+        str:=str||'         dienthoai_lh,ten_kh,ma_hd,diachi_kh,';
+        str:=str||'         TO_CHAR(SUBSTR(nguyennhan, 0, 200)) nguyennhan,';
+        str:=str||'         TO_CHAR(SUBSTR(loai_hong, 0, 200)) loai_hong,ten_kv,';
+        str:=str||'         ghichu_hong,ghichu_th,ton, thuebao_id ';
+        str:=str||'      FROM (SELECT a.baohong_id,dv.donvi_id,dv.ten_dv,e.ten_dt,c.ten_tb,c.diachi_tb,c.diachi_ld,';
+                str:=str||'                     c.ma_tb somay,decode(c.dichvuvt_id,4,lh.loaihinh_tb,dv.ten_dvvt) ten_dvvt, ';
+        str:=str||'                 TO_CHAR(a.ngay_bh, ''dd/MM/yyyy'') ngay_tiepnhan,';
+        str:=str||'                 TO_CHAR(a.ngay_bh, ''hh24:mi:ss'') gio_tiepnhan, ';
+        str:=str||'                 TO_CHAR(a.ngay_ht, ''dd/MM/yyyy'') ngay_xuly, ';
+        str:=str||'                 TO_CHAR(a.ngay_ht, ''hh24:mi:ss'') gio_xuly,' ;
+        str:=str||'                 lay_tg_xuly(a.ngay_bh,a.ngay_ht) tg_khacphuc, ';
+        str:=str||'                 lay_tg_xuly_thuc(a.ngay_bh,a.ngay_ht) tg_khacphuc_thuc, ';
+                         --TO_CHAR(b.ngay_cn, 'dd/MM/yyyy hh24:mi:ss') ngay_cn,
+        str:=str||'                 a.dienthoai_lh,g.ten_kh,g.ma_hd,g.diachi_kh,nn.nguyennhan,';
+        str:=str||'                 nn.loai_hong,b.ngaygiao ngay_giao_dai,b.ngay_th ngay_th_dai,ten_kv,nn.phieu_id, ';
+        str:=str||'                 a.ghichu_hong,b.ghichu_th,ton, c.thuebao_id';
+        str:=str||'      FROM baohong_LCI.baohong a,baohong_LCI.giaophieu b,';
+        str:=str||'             css_LCI.db_thuebao c,css_LCI.diachi_tb dctb,css_LCI.diachi dc,css_LCI.khuvuc_px kvpx,';
+              str:=str||'                   css_LCI.khuvuc kv,css_LCI.khuvuc_lkv lkv,css_LCI.doituong e,css_LCI.db_khachhang g,admin_LCI.donvi dv,';
+        str:=str||'             css_LCI.dichvu_vt dv,css_LCI.loaihinh_tb lh,';
+        str:=str||'      (SELECT a1.baohong_id,wm_concat(ct.ct_hong) nguyennhan,a1.huonggiao_id,wm_concat(lh.loaihong) loai_hong,bh.phieu_id';
+        str:=str||'         FROM baohong_LCI.giaophieu a1,baohong_LCI.nguyennhan bh,baohong_LCI.ct_hong ct,baohong_LCI.loaihong lh ';
+        str:=str||'         WHERE  bh.cthong_id = ct.cthong_id ';
+        str:=str||'         AND a1.phieu_id = bh.phieu_id ';
+        str:=str||'         AND ct.loaihong_id = lh.loaihong_id';
+        str:=str||'         GROUP BY baohong_id,bh.phieu_id,a1.huonggiao_id) nn,';
+        str:=str||'     (SELECT a.baohong_id, to_char(wm_concat(b.ct_ton)) ton ';
+        str:=str||'         FROM baohong_ton a,ct_ton b ';
+        str:=str||'         WHERE a.ctton_id =b.ctton_id ';
+        str:=str||'         GROUP BY a.baohong_id)ton ';
+        str:=str||'     WHERE  a.baohong_id = b.baohong_id ';
+        str:=str||'             AND a.baohong_id = ton.baohong_id(+)';
+        str:=str||'             AND a.thuebao_id = c.thuebao_id';
+        str:=str||'             AND a.thuebao_id =dctb.thuebao_id';
+        str:=str||'             AND dctb.diachild_id =dc.diachi_id';
+        str:=str||'             AND c.loaitb_id =lh.loaitb_id';
+        str:=str||'             AND dc.pho_id =kvpx.pho_id(+)';
+        str:=str||'             AND dc.phuong_id =kvpx.phuong_id(+)';
+        str:=str||'             AND dc.quan_id =kvpx.quan_id(+)';
+        str:=str||'             AND kvpx.khuvuc_id =kv.khuvuc_id(+)';
+        str:=str||'             AND kv.khuvuc_id =lkv.khuvuc_id(+)';
+        str:=str||'           AND lkv.loaikv_id =4 AND c.doituong_id = e.doituong_id AND c.khachhang_id = g.khachhang_id ';
+        str:=str||'             AND a.baohong_id = nn.baohong_id AND b.huonggiao_id = nn.huonggiao_id';
+                           --AND c.donvi_id = dv.donvi_id
+        str:=str||'             AND b.donvi_nhan_id = dv.donvi_id ';
+----------------------------------------------------------------
+             -- str:=str||'         and ADMIN_LCI.LAY_DONVI_CHA(b.donvi_nhan_id,2) = dvc.donvi_id';
+        str:=str||'             AND dv.donvi_id IN (SELECT donvi_id';
+        str:=str||'                         FROM admin_LCI.donvi';
+        str:=str||'                         START WITH donvi_cha_id ='|| vdonvi_id;
+        str:=str||'                         CONNECT BY PRIOR donvi_id = donvi_cha_id)';
+        str:=str||'             AND c.dichvuvt_id=dv.dichvuvt_id';
+        str:=str||'             AND DECODE('||vdichvuvt_id||', 0, 0, c.dichvuvt_id) = '||vdichvuvt_id;
+        str:=str||'             AND DECODE('||vloaitb_id||', 0, 0, c.loaitb_id) ='|| vloaitb_id;
+        str:=str||'             AND b.huonggiao_id in (BAOHONG_LCI.BAOCAO.lay_huonggiao(3,1),BAOHONG_LCI.BAOCAO.lay_huonggiao(3,4),BAOHONG_LCI.BAOCAO.lay_huonggiao(3,8),BAOHONG_LCI.BAOCAO.lay_huonggiao(3,9),BAOHONG_LCI.BAOCAO.lay_huonggiao(3,10),BAOHONG_LCI.BAOCAO.lay_huonggiao(3,11))';
+        str:=str||'             AND a.ttbh_id = 6 AND b.ttph_id <> 3 '; --ko lay giao lai
+        str:=str||'             AND b.nd_tra is null AND a.ngay_ht >= TO_DATE('''||vtungay || ' 00:00:00'', ''dd/MM/yyyy hh24:mi:ss'')';
+        str:=str||'         AND a.ngay_ht <= TO_DATE('''||vdenngay || ' 23:59:59'', ''dd/MM/yyyy hh24:mi:ss'')) bh_dai';
+                str:=str||' )';
+        Open vreturn for str;
+    END;

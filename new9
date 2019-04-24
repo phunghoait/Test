@@ -1,0 +1,15 @@
+select count(*) as Tong_PSC_CoDinh,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV ,a7.TEN_NV
+from bcss_lci.ct_no_20190301 a,tinhcuoc_lci.dbtb_20190301 a3, CSS_LCI.LOAIHINH_TB a1, 
+ADMIN_LCI.DONVI a2, tinhcuoc_lci.dbtb_kv_20190301 a4, CSS_LCI.KHUVUC a5, CSS_LCI.KHUVUC_NV a6, ADMIN_LCI.NHANVIEN a7
+where a.MA_TB = A3.MA_TB
+and a.LOAITB_ID = a1.loaitb_id
+AND a.DONVI_QL_ID = A2.DONVI_ID
+and A3.THUEBAO_ID = A4.THUEBAO_ID
+and a4.khuvuc_id = a5.khuvuc_id
+and A4.KHUVUC_ID = A6.KHUVUC_ID
+and A6.NHANVIEN_ID = A7.NHANVIEN_ID
+and a.LOAITB_ID = 1
+and a6.loainv_id = 51
+and a6.loaikv_id = 4
+GROUP BY A4.KHUVUC_ID, a.DONVI_QL_ID,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV, a7.TEN_NV
+ORDER BY A5.TEN_KV 
