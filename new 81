@@ -1,0 +1,78 @@
+---------------------------------------- Lấy ds kết cuối nhập trên VNPT Cab---------------------------------------------------------------
+select A1.TEN_KC,A1.KYHIEU,A1.DIACHI,a1.LOAIKC_ID,A1.KINHDO,A1.VIDO,A1.NGUOI_CN,a2.TEN_NV 
+from cabman_lci.ketcuoi_dt a1, ADMIN_LCI.NHANVIEN a2
+where a1.NHANVIEN_ID = A2.NHANVIEN_ID
+And NGAY_CN >= to_date('21/05/2019','dd/MM/yyyy') 
+and NGAY_CN < to_date('22/05/2019','dd/MM/yyyy')
+
+<Invoices><Inv><key>1990765520190522110919</key><Invoice><CusCode>19907655</CusCode><Buyer><![CDATA[NGUYỄN HỮU NHẬT MINH]]></Buyer><CusName><![CDATA[]]></CusName><CusAddress><![CDATA[Sơn Mãn  X. Vạn Hoà, TP. Lào Cai, T. Lào Cai.]]></CusAddress><CusBankName><![CDATA[Nam]]></CusBankName><CusBankNo>2015</CusBankNo><CusPhone>0987658118</CusPhone><CusTaxCode></CusTaxCode><PaymentMethod><![CDATA[TM]]></PaymentMethod><Products><Product><ProdName><![CDATA[Phí điều trị nội trú]]></ProdName><ProdUnit><![CDATA[Lần]]></ProdUnit><ProdQuantity>1</ProdQuantity><ProdPrice>471200</ProdPrice><Amount>471200</Amount></Product><Product><ProdName><![CDATA[Thuốc điều trị nội trú]]></ProdName><ProdUnit><![CDATA[Lần]]></ProdUnit><ProdQuantity>1</ProdQuantity><ProdPrice>104700</ProdPrice><Amount>104700</Amount></Product></Products><Total>575900</Total><DiscountAmount></DiscountAmount><VATRate>0</VATRate><VATAmount>0</VATAmount><Amount>575900</Amount><AmountInWords>Năm trăm bẩy mươi lăm nghìn, chín trăm đồng</AmountInWords><KindOfService></KindOfService><Extra><![CDATA[1990765520190522110919]]></Extra><Extra1>2.038.729,92</Extra1><Extra2>1.462.829,92</Extra2><Extra3>1.000.000</Extra3><Extra4></Extra4><Extra5>-424.100</Extra5><ArisingDate>22/05/2019</ArisingDate><PaymentStatus>1</PaymentStatus></Invoice></Inv></Invoices>
+
+
+
+select * from (
+select a.ma_tt ma_gd, a.loaihoadon_moi mauso, a.seri_moi kyhieu, a.so_hd_moi so_hd,
+         to_char(a.ngay_cn,'dd/MM/YYYY') ngay_ky,
+         a.tongtien , round((a.tongtien/1.1),0) tien_chua_vat, (a.tongtien - round((a.tongtien/1.1),0)) as thue,
+         xmltype(a.thongtinhd_moi).extract('//CusName/text()').getStringVal() ten_tt,
+         xmltype(a.thongtinhd_moi).extract('//CusAddress/text()').getStringVal() diachi_tt,
+         xmltype(a.thongtinhd_moi).extract('//CusTaxCode/text()').getStringVal() mst,
+         a.nguoi_cn, a.ghichu, a.kieu_bd
+     from bcss_LCI.bd_hddt a,
+         css_LCI.phieutt_hd b
+     where a.hdkh_id = b.hdkh_id
+         and a.phieutt_id = b.phieutt_id
+         and a.kieu_bd in (4,5)
+         and a.ngay_cn >= to_date('01/05/2019 00:00:00', 'DD/MM/YYYY HH24:MI:SS')
+         and a.ngay_cn <= to_date('23/05/2019 23:59:59', 'DD/MM/YYYY HH24:MI:SS')
+         and a.trangthai in (1,3)
+    union all
+    -- Dieu Chinh
+    select a.ma_tt ma_gd, a.loaihoadon_moi mauso, a.seri_moi kyhieu, a.so_hd_moi so_hd,
+         to_char(a.ngay_cn,'dd/MM/YYYY') ngay_ky,
+         decode(a.kieu_bd,10,0,8,a.tongtien,9,-abs(a.tongtien)) tongtien,
+         round((decode(a.kieu_bd,10,0,8,a.tongtien,9,-abs(a.tongtien))/1.1),0) tien_chua_vat,
+         (decode(a.kieu_bd,10,0,8,a.tongtien,9,-abs(a.tongtien)) - round((decode(a.kieu_bd,10,0,8,a.tongtien,9,-abs(a.tongtien))/1.1),0)) as thue,
+         xmltype(a.thongtinhd_moi).extract('//CusName/text()').getStringVal() ten_tt,
+         xmltype(a.thongtinhd_moi).extract('//CusAddress/text()').getStringVal() diachi_tt,
+         xmltype(a.thongtinhd_moi).extract('//CusTaxCode/text()').getStringVal() mst,
+         a.nguoi_cn, a.ghichu, a.kieu_bd
+     from bcss_LCI.bd_hddt a,
+         css_LCI.phieutt_hd  b
+     where a.hdkh_id = b.hdkh_id
+         and a.phieutt_id = b.phieutt_id
+         and a.kieu_bd in (8,9,10)
+         and a.ngay_cn >= to_date('01/05/2019 00:00:00', 'DD/MM/YYYY HH24:MI:SS')
+         and a.ngay_cn <= to_date('23/05/2019 23:59:59', 'DD/MM/YYYY HH24:MI:SS')
+    union all
+    -- Thay the
+     select a.ma_tt ma_gd, a.loaihoadon_moi mauso, a.seri_moi kyhieu, a.so_hd_moi so_hd,
+         to_char(a.ngay_cn,'dd/MM/YYYY') ngay_ky, a.tongtien , round((a.tongtien/1.1),0) tien_chua_vat, (a.tongtien - round((a.tongtien/1.1),0)) as thue,
+         xmltype(a.thongtinhd_moi).extract('//CusName/text()').getStringVal() ten_tt,
+         xmltype(a.thongtinhd_moi).extract('//CusAddress/text()').getStringVal() diachi_tt,
+         xmltype(a.thongtinhd_moi).extract('//CusTaxCode/text()').getStringVal() mst,
+         a.nguoi_cn, a.ghichu, a.kieu_bd
+     from bcss_LCI.bd_hddt a,
+         css_LCI.phieutt_hd b
+     where a.hdkh_id = b.hdkh_id
+         and a.phieutt_id = b.phieutt_id
+         and a.kieu_bd = 2
+         and a.ngay_cn >= to_date('01/05/2019 00:00:00', 'DD/MM/YYYY HH24:MI:SS')
+         and a.ngay_cn <= to_date('23/05/2019 23:59:59', 'DD/MM/YYYY HH24:MI:SS')
+         and a.trangthai in (1,3)
+    )
+WHERE ma_gd = 'LCI-PS/000000093'
+    order by ma_gd, to_date(ngay_ky,'dd/MM/YYYY')
+	
+	
+	
+	
+	select xmltype(a.thongtinhd_moi).extract('//invNum/text()').getStringVal() SoHD from BCSS_LCI.BD_HDDT a
+ where xmltype(a.thongtinhd_moi).extract('//invNum/text()').getStringVal() = 5820
+
+select * from BCSS_LCI.BD_HDDT a 
+where 
+ROWNUM < 10 and a.SO_HD_MOI = '5820' 
+
+a.ma_tt = 'LCI-PS/000000093' 
+SELECT * FROM CSS_LCI.PHIEUTT_HD WHERE HDKH_ID = 
+select * from BCSS_LCI.BD_HDDT WHERE HDKH_ID is null or PHIEUTT_ID is null

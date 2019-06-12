@@ -1,0 +1,390 @@
+SELECT KV.KVC_ID,KV.TEN_KVC, KV.KHUVUC_ID, KV.MA_KV, KV.TEN_KV, 
+				nvl(sum(soluong.FIBER),0) sl_FIBER,nvl(sum(doanhthu.SL_PSC_fiber),0) SL_PSC_fiber,			nvl(sum(doanhthu.DT_fiber),0) DT_fiber, 
+				nvl(sum(soluong.mega),0) sl_mega,nvl(sum(doanhthu.sl_psc_mega),0) sl_psc_mega,				nvl(sum(doanhthu.dt_mega),0) dt_mega, 
+				nvl(sum(soluong.mytv),0) sl_mytv,nvl(sum(doanhthu.sl_psc_mytv),0) sl_psc_mytv,				nvl(sum(doanhthu.dt_mytv),0) dt_mytv, 
+				nvl(sum(soluong.IMS),0) sl_IMS,nvl(sum(doanhthu.SL_PSC_IMS),0) SL_PSC_IMS,				nvl(sum(doanhthu.DT_IMS),0) DT_IMS, 
+				nvl(sum(soluong.PSTN),0) sl_PSTN,nvl(sum(doanhthu.SL_PSC_PSTN),0) SL_PSC_PSTN,				nvl(sum(doanhthu.DT_PSTN),0) DT_PSTN, 
+				nvl(sum(soluong.KTR),0) sl_KTR,nvl(sum(doanhthu.SL_PSC_KTR),0) SL_PSC_KTR,				nvl(sum(doanhthu.DT_KTR),0) DT_KTR, 
+				nvl(sum(soluong.KTR),0) sl_didong,nvl(sum(doanhthu.SL_PSC_DIDONG),0) SL_PSC_DIDONG,				nvl(sum(doanhthu.DT_DIDONG),0) DT_DIDONG, 
+				nvl(sum(soluong.khac),0) sl_khac,nvl(sum(doanhthu.SL_PSC_khac),0) SL_PSC_khac,				nvl(sum(doanhthu.DT_khac),0) DT_khac 
+FROM 
+(SELECT  kvc.khuvuc_cha_id,kv.khuvuc_id,  
+				 SUM (CASE WHEN b.loaitb_id = 58 then 1 else 0 END) SL_PSC_fiber, 
+				 SUM (CASE WHEN b.loaitb_id = 58 then tien else 0 END) DT_fiber, 
+				 SUM (CASE WHEN b.loaitb_id = 11 then 1 else 0 END) sl_psc_mega, 
+				 SUM (CASE WHEN b.loaitb_id = 11 then tien else 0 END) dt_mega, 
+				 SUM (CASE WHEN b.loaitb_id = 61 then 1 else 0 END) sl_psc_mytv, 
+				 SUM (CASE WHEN b.loaitb_id = 61 then tien else 0 END) dt_mytv, 
+				 SUM (CASE WHEN b.DICHVUVT_ID = 1 then 1 else 0 END) SL_PSC_PSTN, 
+				 SUM (CASE WHEN b.DICHVUVT_ID = 1 then tien else 0 END) DT_PSTN, 
+				 SUM (CASE WHEN b.DICHVUVT_ID = 11 then 1 else 0 END) SL_PSC_IMS, 
+				 SUM (CASE WHEN b.DICHVUVT_ID = 11 then tien else 0 END) DT_IMS, 
+				 SUM (CASE WHEN b.DICHVUVT_ID in (8,9) then 1 else 0 END) SL_PSC_KTR, 
+				 SUM (CASE WHEN b.DICHVUVT_ID in (8,9) then tien else 0 END) DT_KTR, 
+				 SUM (CASE WHEN b.DICHVUVT_ID = 2 then 1 else 0 END) SL_PSC_DIDONG, 
+				 SUM (CASE WHEN b.DICHVUVT_ID = 2 then tien else 0 END) DT_DIDONG, 
+				 SUM (CASE WHEN b.DICHVUVT_ID not in (1,2,4,8,9,11) then 1 else 0 END) SL_PSC_khac, 
+				 SUM (CASE WHEN b.DICHVUVT_ID not in (1,2,4,8,9,11) then tien else 0 END) DT_khac 
+				FROM BCSS_LCI.HDDT_TB_'||vkyhoadonmoi||' a LEFT JOIN CSS_LCI.DB_THUEBAO	b on (a.MA_TB = b.MA_TB AND a.DICHVUVT_ID = b.DICHVUVT_ID) 
+							LEFT JOIN CSS_LCI.DBTB_KV kv on b.thuebao_id = kv.thuebao_id 
+							LEFT JOIN CSS_LCI.KHUVUC kvc on kv.khuvuc_id = kvc.khuvuc_id 
+GROUP BY kvc.khuvuc_cha_id,kv.khuvuc_id) doanhthu, 
+(SELECT  kvc.khuvuc_cha_id,kv.khuvuc_id,  
+				 SUM (CASE WHEN a.loaitb_id = 58 then 1 else 0 END) fiber, 
+				 SUM (CASE WHEN a.loaitb_id = 11 then 1 else 0 END) mega, 
+				 SUM (CASE WHEN a.loaitb_id = 61 then 1 else 0 END) mytv, 
+				 SUM (CASE WHEN a.DICHVUVT_ID = 1 then 1 else 0 END) PSTN, 
+				 SUM (CASE WHEN a.DICHVUVT_ID = 11 then 1 else 0 END) IMS, 
+				 SUM (CASE WHEN a.DICHVUVT_ID in (8,9) then 1 else 0 END) KTR, 
+				 SUM (CASE WHEN a.DICHVUVT_ID in (2) then 1 else 0 END) DIDONG, 
+				 SUM (CASE WHEN a.DICHVUVT_ID not in (1,2,4,8,9,11) then 1 else 0 END) khac 
+							FROM TINHCUOC_LCI.DBTB_'||vkyhoadonmoi||' a  
+							LEFT JOIN CSS_LCI.DBTB_KV kv on a.thuebao_id = kv.thuebao_id 
+							LEFT JOIN CSS_LCI.KHUVUC kvc on kv.khuvuc_id = kvc.khuvuc_id 
+							WHERE a.trangthaitb_id = 1 
+GROUP BY kvc.khuvuc_cha_id,kv.khuvuc_id) soluong, 
+( 
+	SELECT kvc.KHUVUC_ID as kvc_id, kvc.TEN_KV as ten_kvc, kv.khuvuc_id, kv.ten_kv, kv.MA_KV  
+	FROM CSS_LCI.KHUVUC kv JOIN CSS_LCI.KHUVUC kvc on kv.khuvuc_cha_id = kvc.khuvuc_id 
+) kv 
+WHERE KV.KHUVUC_ID = doanhthu.KHUVUC_ID(+) 
+AND KV.KVC_ID = doanhthu.khuvuc_cha_id(+) 
+AND KV.KHUVUC_ID = soluong.KHUVUC_ID(+) 
+AND KV.KVC_ID = soluong.khuvuc_cha_id(+) 
+AND (KV.KVC_ID = '||vkhuvuc_id||' or '||vkhuvuc_id||' = -1) 
+GROUP BY KV.KVC_ID,KV.TEN_KVC, KV.KHUVUC_ID, KV.MA_KV, KV.TEN_KV 
+ORDER BY KV.KVC_ID,KV.TEN_KVC, KV.KHUVUC_ID, KV.MA_KV 
+----------------------------Phát sinh cước 1---------------------------------------------------------------------													
+SELECT KV.KVC_ID,KV.TEN_KVC, KV.KHUVUC_ID, KV.MA_KV, KV.TEN_KV, KV.ten_NV,
+				nvl(sum(soluong.FIBER),0) sl_FIBER,
+				nvl(sum(doanhthu.SL_PSC_fiber),0) SL_PSC_fiber,		
+				nvl(sum(doanhthu.DT_fiber),0) DT_fiber, 
+				nvl(sum(soluong.mega),0) sl_mega,
+				nvl(sum(doanhthu.sl_psc_mega),0) sl_psc_mega,		
+				nvl(sum(doanhthu.dt_mega),0) dt_mega, 
+				nvl(sum(soluong.mytv),0) sl_mytv,
+			  nvl(sum(doanhthu.sl_psc_mytv),0) sl_psc_mytv,			
+				nvl(sum(doanhthu.dt_mytv),0) dt_mytv, 
+				nvl(sum(soluong.VMEET),0) sl_VMEET,
+				nvl(sum(doanhthu.SL_PSC_VMEET),0) SL_PSC_VMEET,			
+				nvl(sum(doanhthu.DT_VMEET),0) DT_VMEET, 
+				nvl(sum(soluong.CD),0) sl_CD,
+				nvl(sum(doanhthu.SL_PSC_CD),0) SL_PSC_CD,			
+				nvl(sum(doanhthu.DT_CD),0) DT_CD, 
+				nvl(sum(soluong.KTR),0) sl_KTR,
+				nvl(sum(doanhthu.SL_PSC_KTR),0) SL_PSC_KTR,				
+				nvl(sum(doanhthu.DT_KTR),0) DT_KTR
+FROM 
+(SELECT  kvc.khuvuc_cha_id,kv.khuvuc_id,  
+				 SUM (CASE WHEN b.loaitb_id = 58 then 1 else 0 END) SL_PSC_fiber, 
+				 SUM (CASE WHEN b.loaitb_id = 58 then tien else 0 END) DT_fiber, 
+				 SUM (CASE WHEN b.loaitb_id = 11 then 1 else 0 END) sl_psc_mega, 
+				 SUM (CASE WHEN b.loaitb_id = 11 then tien else 0 END) dt_mega, 
+				 SUM (CASE WHEN b.loaitb_id = 61 then 1 else 0 END) sl_psc_mytv, 
+				 SUM (CASE WHEN b.loaitb_id = 61 then tien else 0 END) dt_mytv, 
+				 SUM (CASE WHEN b.DICHVUVT_ID = 1 then 1 else 0 END) SL_PSC_CD, 
+				 SUM (CASE WHEN b.DICHVUVT_ID = 1 then tien else 0 END) DT_CD, 
+				 SUM (CASE WHEN b.DICHVUVT_ID = 13 then 1 else 0 END) SL_PSC_VMEET, 
+				 SUM (CASE WHEN b.DICHVUVT_ID = 13 then tien else 0 END) DT_VMEET, 
+				 SUM (CASE WHEN b.DICHVUVT_ID in (8,9) then 1 else 0 END) SL_PSC_KTR, 
+				 SUM (CASE WHEN b.DICHVUVT_ID in (8,9) then tien else 0 END) DT_KTR 
+				FROM BCSS_LCI.HDDT_TB_20190301 a LEFT JOIN CSS_LCI.DB_THUEBAO	b on (a.MA_TB = b.MA_TB AND a.DICHVUVT_ID = b.DICHVUVT_ID) 
+							LEFT JOIN CSS_LCI.DBTB_KV kv on b.thuebao_id = kv.thuebao_id 
+							LEFT JOIN CSS_LCI.KHUVUC kvc on kv.khuvuc_id = kvc.khuvuc_id 
+GROUP BY kvc.khuvuc_cha_id,kv.khuvuc_id) doanhthu, 
+(SELECT  kvc.khuvuc_cha_id,kv.khuvuc_id,  
+				 SUM (CASE WHEN a.loaitb_id = 58 then 1 else 0 END) fiber, 
+				 SUM (CASE WHEN a.loaitb_id = 11 then 1 else 0 END) mega, 
+				 SUM (CASE WHEN a.loaitb_id = 61 then 1 else 0 END) mytv, 
+				 SUM (CASE WHEN a.DICHVUVT_ID = 1 then 1 else 0 END) CD, 
+				 SUM (CASE WHEN a.DICHVUVT_ID = 13 then 1 else 0 END) VMEET, 
+				 SUM (CASE WHEN a.DICHVUVT_ID in (8,9) then 1 else 0 END) KTR
+							FROM TINHCUOC_LCI.DBTB_20190301 a  
+							LEFT JOIN CSS_LCI.DBTB_KV kv on a.thuebao_id = kv.thuebao_id 
+							LEFT JOIN CSS_LCI.KHUVUC kvc on kv.khuvuc_id = kvc.khuvuc_id 
+							WHERE a.trangthaitb_id = 1 
+GROUP BY kvc.khuvuc_cha_id,kv.khuvuc_id) soluong, 
+( 
+	SELECT kvc.KHUVUC_ID as kvc_id, kvc.TEN_KV as ten_kvc, kv.khuvuc_id, kv.ten_kv, kv.MA_KV, nv.TEN_NV as TEN_NV  
+	FROM CSS_LCI.KHUVUC kv JOIN CSS_LCI.KHUVUC kvc on kv.khuvuc_cha_id = kvc.khuvuc_id 
+	JOIN CSS_LCI.KHUVUC_NV kvnv on kv.KHUVUC_ID = kvnv.KHUVUC_ID
+	JOIN ADMIN_LCI.Nhanvien nv on kvnv.NHANVIEN_ID = nv.NHANVIEN_ID
+	WHERE kvnv.loainv_id = 51
+	AND kvnv.loaikv_id = 4
+) kv
+WHERE KV.KHUVUC_ID = doanhthu.KHUVUC_ID(+) 
+AND KV.KVC_ID = doanhthu.khuvuc_cha_id(+) 
+AND KV.KHUVUC_ID = soluong.KHUVUC_ID(+) 
+AND KV.KVC_ID = soluong.khuvuc_cha_id(+)
+GROUP BY KV.KVC_ID,KV.TEN_KVC, KV.KHUVUC_ID, KV.MA_KV, KV.TEN_KV , KV.TEN_NV
+ORDER BY KV.KVC_ID,KV.TEN_KVC, KV.KHUVUC_ID, KV.MA_KV, KV.TEN_NV 													
+----------------------------Phát sinh cước 2----------------------------------------------------------------------------------------------------													
+SELECT KV.KVC_ID,KV.TEN_KVC, KV.KHUVUC_ID, KV.MA_KV, KV.TEN_KV, KV.ten_NV,
+				nvl(sum(soluong.FIBER),0) sl_FIBER,
+				nvl(sum(doanhthu.SL_PSC_fiber),0) SL_PSC_fiber,		
+				nvl(sum(doanhthu.DT_fiber),0) DT_fiber, 
+				nvl(sum(soluong.mega),0) sl_mega,
+				nvl(sum(doanhthu.sl_psc_mega),0) sl_psc_mega,		
+				nvl(sum(doanhthu.dt_mega),0) dt_mega, 
+				nvl(sum(soluong.mytv),0) sl_mytv,
+			  nvl(sum(doanhthu.sl_psc_mytv),0) sl_psc_mytv,			
+				nvl(sum(doanhthu.dt_mytv),0) dt_mytv, 
+				nvl(sum(soluong.VMEET),0) sl_VMEET,
+				nvl(sum(doanhthu.SL_PSC_VMEET),0) SL_PSC_VMEET,			
+				nvl(sum(doanhthu.DT_VMEET),0) DT_VMEET, 
+				nvl(sum(soluong.CD),0) sl_CD,
+				nvl(sum(doanhthu.SL_PSC_CD),0) SL_PSC_CD,			
+				nvl(sum(doanhthu.DT_CD),0) DT_CD, 
+				nvl(sum(soluong.KTR),0) sl_KTR,
+				nvl(sum(doanhthu.SL_PSC_KTR),0) SL_PSC_KTR,				
+				nvl(sum(doanhthu.DT_KTR),0) DT_KTR
+FROM 
+(SELECT  kvc.khuvuc_cha_id,kv.khuvuc_id,  
+				 SUM (CASE WHEN b.loaitb_id = 58 then 1 else 0 END) SL_PSC_fiber, 
+				 SUM (CASE WHEN b.loaitb_id = 58 then tien else 0 END) DT_fiber, 
+				 SUM (CASE WHEN b.loaitb_id = 11 then 1 else 0 END) sl_psc_mega, 
+				 SUM (CASE WHEN b.loaitb_id = 11 then tien else 0 END) dt_mega, 
+				 SUM (CASE WHEN b.loaitb_id = 61 then 1 else 0 END) sl_psc_mytv, 
+				 SUM (CASE WHEN b.loaitb_id = 61 then tien else 0 END) dt_mytv, 
+				 SUM (CASE WHEN b.DICHVUVT_ID = 1 then 1 else 0 END) SL_PSC_CD, 
+				 SUM (CASE WHEN b.DICHVUVT_ID = 1 then tien else 0 END) DT_CD, 
+				 SUM (CASE WHEN b.DICHVUVT_ID = 13 then 1 else 0 END) SL_PSC_VMEET, 
+				 SUM (CASE WHEN b.DICHVUVT_ID = 13 then tien else 0 END) DT_VMEET, 
+				 SUM (CASE WHEN b.DICHVUVT_ID in (8,9) then 1 else 0 END) SL_PSC_KTR, 
+				 SUM (CASE WHEN b.DICHVUVT_ID in (8,9) then tien else 0 END) DT_KTR 
+				FROM BCSS_LCI.HDDT_TB_20190301 a LEFT JOIN CSS_LCI.DB_THUEBAO	b on (a.MA_TB = b.MA_TB AND a.DICHVUVT_ID = b.DICHVUVT_ID) 
+							LEFT JOIN CSS_LCI.DBTB_KV kv on b.thuebao_id = kv.thuebao_id 
+							LEFT JOIN CSS_LCI.KHUVUC kvc on kv.khuvuc_id = kvc.khuvuc_id 
+GROUP BY kvc.khuvuc_cha_id,kv.khuvuc_id) doanhthu, 
+(SELECT  kvc.khuvuc_cha_id,kv.khuvuc_id,  
+				 SUM (CASE WHEN a.loaitb_id = 58 then 1 else 0 END) fiber, 
+				 SUM (CASE WHEN a.loaitb_id = 11 then 1 else 0 END) mega, 
+				 SUM (CASE WHEN a.loaitb_id = 61 then 1 else 0 END) mytv, 
+				 SUM (CASE WHEN a.DICHVUVT_ID = 1 then 1 else 0 END) CD, 
+				 SUM (CASE WHEN a.DICHVUVT_ID = 13 then 1 else 0 END) VMEET, 
+				 SUM (CASE WHEN a.DICHVUVT_ID in (8,9) then 1 else 0 END) KTR
+							FROM TINHCUOC_LCI.DBTB_20190301 a  
+							LEFT JOIN CSS_LCI.DBTB_KV kv on a.thuebao_id = kv.thuebao_id 
+							LEFT JOIN CSS_LCI.KHUVUC kvc on kv.khuvuc_id = kvc.khuvuc_id 
+							WHERE a.trangthaitb_id = 1 
+GROUP BY kvc.khuvuc_cha_id,kv.khuvuc_id) soluong, 
+( 
+	SELECT kvc.KHUVUC_ID as kvc_id, kvc.TEN_KV as ten_kvc, kv.khuvuc_id, kv.ten_kv, kv.MA_KV, listagg(nv.TEN_NV, ',') within group (order by nv.TEN_NV) as TEN_NV
+	FROM CSS_LCI.KHUVUC kv JOIN CSS_LCI.KHUVUC kvc on kv.khuvuc_cha_id = kvc.khuvuc_id 
+	JOIN CSS_LCI.KHUVUC_NV kvnv on kv.KHUVUC_ID = kvnv.KHUVUC_ID
+	JOIN ADMIN_LCI.Nhanvien nv on kvnv.NHANVIEN_ID = nv.NHANVIEN_ID
+	WHERE kvnv.loainv_id = 51
+	AND kvnv.loaikv_id = 4
+	group by kvnv.KHUVUC_ID,kvc.KHUVUC_ID, kvc.TEN_KV, kv.khuvuc_id, kv.ten_kv, kv.MA_KV
+) kv
+WHERE KV.KHUVUC_ID = doanhthu.KHUVUC_ID(+) 
+AND KV.KVC_ID = doanhthu.khuvuc_cha_id(+) 
+AND KV.KHUVUC_ID = soluong.KHUVUC_ID(+) 
+AND KV.KVC_ID = soluong.khuvuc_cha_id(+)
+GROUP BY KV.KVC_ID,KV.TEN_KVC, KV.KHUVUC_ID, KV.MA_KV, KV.TEN_KV , KV.TEN_NV
+ORDER BY KV.KVC_ID,KV.TEN_KVC, KV.KHUVUC_ID, KV.MA_KV, KV.TEN_NV 													
+----------------------------Danh sách đơn vị------------------------------------------------------------------------------------													
+SELECT d.ten_dv as donvicha,d.DONVI_ID, d. c.ten_dv,a.nhanvien_id,a.ten_nv,a.ma_nv, b.ma_nd
+FROM ADMIN_LCI.NHANVIEN a left join ADMIN_LCI.NGUOIDUNG b on a.nhanvien_id = b.nhanvien_id
+		JOIN ADMIN_LCI.DONVI c on a.donvi_id = c.donvi_id
+		JOIN ADMIN_LCI.DONVI d on c.donvi_cha_id = d.donvi_id
+WHERE c.donvi_id in (10,84,85,86,87,88,89,90,91,92,10002) OR c.DONVI_CHA_ID IN (10,84,85,86,87,88,89,90,91,92,10001)
+			AND c.donvi_id <> 604
+ORDER BY c.DONVI_CHA_ID, c.donvi_id, a.nhanvien_id	
+---------------------------------------------------------------------------------------------------------------------------------
+select a.ma_tb,tinh,vnp from
+(select ma_tb,sum(tragoc + trathue - chihoahong) tinh from qltn_lci.BANGPHIEUTRA_01032019 a,qltn_lci.CT_TRA_01032019 b
+where a.phieu_id = b.phieu_id and dichvuvt_id =2 and a.phieu_id_neo is not null group by ma_tb ) a,
+(select substr(somay,3,length(somay -2)) ma_tb,sum(tientra) vnp from BAOCAO_LCI."TRA_Thang32019" where nguoigach<>'ccbs_vnp' 
+group by substr(somay,3,LENGTH(somay -2))) b
+where a.ma_tb = b.ma_tb(+) and nvl(tinh ,0) <> nvl(vnp,0);
+
+--Check số liệu lệch giữa PTTB so với NEO CCBS 
+select a.ma_tb,vnp,tinh from
+(select substr(somay,3,length(somay -2)) ma_tb,sum(tientra) vnp from BAOCAO_LCI."TRA_Thang32019" where nguoigach<>'ccbs_vnp' 
+group by substr(somay,3,LENGTH(somay -2))) a,
+(select ma_tb,sum(tragoc + trathue - chihoahong) tinh from qltn_lci.BANGPHIEUTRA_01032019 a,qltn_lci.CT_TRA_01032019 b
+where a.phieu_id = b.phieu_id and dichvuvt_id =2 and a.phieu_id_neo is not null group by ma_tb ) b
+where a.ma_tb = b.ma_tb(+) and nvl(vnp ,0) <> nvl(tinh,0)
+---------------------------------------------------------------------------------------------------------------------------------												
+SELECT d.ten_dv as donvicha,d.DONVI_ID, c.ten_dv, c.ma_dv,
+ a.nhanvien_id,a.ten_nv,a.ma_nv, b.ma_nd
+FROM ADMIN_LCI.NHANVIEN a left join ADMIN_LCI.NGUOIDUNG b on a.nhanvien_id = b.nhanvien_id
+		JOIN ADMIN_LCI.DONVI c on a.donvi_id = c.donvi_id
+		JOIN ADMIN_LCI.DONVI d on c.donvi_cha_id = d.donvi_id
+WHERE c.donvi_id in (10,84,85,86,87,88,89,90,91,92,10002) OR c.DONVI_CHA_ID IN (10,84,85,86,87,88,89,90,91,92,10001)
+			AND c.donvi_id <> 604
+ORDER BY c.DONVI_CHA_ID, c.donvi_id, a.nhanvien_id													
+-------------------Phát triển mới--------------------------------------------------------------------------------			
+SELECT KV.KVC_ID,KV.TEN_KVC, KV.KHUVUC_ID, KV.MA_KV, KV.TEN_KV,kv.TEN_NV,
+							nvl(sum(PTM.FIBER),0) ptm_FIBER,
+							nvl(sum(PTM.mega),0) ptm_mega,
+							nvl(sum(PTM.mytv),0) ptm_mytv,
+							nvl(sum(PTM.VMEET),0) ptm_VMEET,
+							nvl(sum(PTM.CD),0) ptm_CD,
+							nvl(sum(PTM.KTR),0) ptm_KTR
+			FROM
+			(SELECT  kvc.khuvuc_cha_id,kv.khuvuc_id, 
+							 SUM (CASE WHEN b.loaitb_id = 58 then 1 else 0 END) fiber,
+							 SUM (CASE WHEN b.loaitb_id = 11 then 1 else 0 END) mega,
+							 SUM (CASE WHEN b.loaitb_id = 61 then 1 else 0 END) mytv,
+							 SUM (CASE WHEN b.DICHVUVT_ID = 1 then 1 else 0 END) CD,
+							 SUM (CASE WHEN b.DICHVUVT_ID = 13 then 1 else 0 END) VMEET,
+							 SUM (CASE WHEN b.DICHVUVT_ID in (8,9) then 1 else 0 END) KTR
+										FROM CSS_LCI.HD_KHACHHANG a join CSS_LCI.HD_THUEBAO b on a.HDKH_ID = b.HDKH_ID
+										LEFT JOIN CSS_LCI.DBTB_KV kv on b.thuebao_id = kv.thuebao_id
+										LEFT JOIN CSS_LCI.KHUVUC kvc on kv.khuvuc_id = kvc.khuvuc_id
+										WHERE a.LOAIHD_ID IN (1,6)
+										and b.KIEULD_ID not in (16,22,622)
+										and b.TTHD_ID = 6
+										and b.ngay_ht >= TO_DATE('01/03/2019 00:00:00','DD/MM/YYYY HH24:MI:SS')
+										and b.ngay_ht <= TO_DATE('31/03/2019 23:59:59','DD/MM/YYYY HH24:MI:SS')	
+			GROUP BY kvc.khuvuc_cha_id,kv.khuvuc_id) ptm,
+			(
+				SELECT kvc.KHUVUC_ID as kvc_id, kvc.TEN_KV as ten_kvc, kv.khuvuc_id, kv.ten_kv, kv.MA_KV ,listagg(nv.TEN_NV, ',') within group (order by nv.TEN_NV) as TEN_NV
+				FROM CSS_LCI.KHUVUC kv 
+				JOIN CSS_LCI.KHUVUC kvc on kv.khuvuc_cha_id = kvc.khuvuc_id
+				JOIN CSS_LCI.KHUVUC_NV kvnv on kv.KHUVUC_ID = kvnv.KHUVUC_ID
+				JOIN ADMIN_LCI.Nhanvien nv on kvnv.NHANVIEN_ID = nv.NHANVIEN_ID
+				WHERE kvnv.loainv_id = 51
+				AND kvnv.loaikv_id = 4
+				group by kvnv.KHUVUC_ID,kvc.KHUVUC_ID, kvc.TEN_KV, kv.khuvuc_id, kv.ten_kv, kv.MA_KV
+			) kv
+			WHERE KV.KHUVUC_ID = PTM.KHUVUC_ID(+)
+			AND KV.KVC_ID = ptm.khuvuc_cha_id(+)
+			GROUP BY KV.KVC_ID,KV.TEN_KVC, KV.KHUVUC_ID, KV.MA_KV, KV.TEN_KV,KV.TEN_NV
+			ORDER BY KV.KVC_ID,KV.TEN_KVC, KV.KHUVUC_ID, KV.MA_KV;													
+------ Check PTM ko có khu vực 	------------------------------------------------------------------------------------------------
+SELECT nvl(sum(PTM.FIBER),0) ptm_FIBER,
+							nvl(sum(PTM.mega),0) ptm_mega,
+							nvl(sum(PTM.mytv),0) ptm_mytv,
+							nvl(sum(PTM.VMEET),0) ptm_VMEET,
+							nvl(sum(PTM.CD),0) ptm_CD,
+							nvl(sum(PTM.KTR),0) ptm_KTR
+			FROM
+			(SELECT  SUM (CASE WHEN b.loaitb_id = 58 then 1 else 0 END) fiber,
+							 SUM (CASE WHEN b.loaitb_id = 11 then 1 else 0 END) mega,
+							 SUM (CASE WHEN b.loaitb_id = 61 then 1 else 0 END) mytv,
+							 SUM (CASE WHEN b.DICHVUVT_ID = 1 then 1 else 0 END) CD,
+							 SUM (CASE WHEN b.DICHVUVT_ID = 13 then 1 else 0 END) VMEET,
+							 SUM (CASE WHEN b.DICHVUVT_ID in (8,9) then 1 else 0 END) KTR
+										FROM CSS_LCI.HD_KHACHHANG a join CSS_LCI.HD_THUEBAO b on a.HDKH_ID = b.HDKH_ID
+										LEFT JOIN CSS_LCI.DBTB_KV kv on b.thuebao_id = kv.thuebao_id
+										LEFT JOIN CSS_LCI.KHUVUC kvc on kv.khuvuc_id = kvc.khuvuc_id
+										WHERE a.LOAIHD_ID IN (1,6)
+										and b.KIEULD_ID not in (16,22,622)
+										and b.TTHD_ID = 6
+										and b.ngay_ht >= TO_DATE('01/03/2019 00:00:00','DD/MM/YYYY HH24:MI:SS')
+										and b.ngay_ht <= TO_DATE('31/03/2019 23:59:59','DD/MM/YYYY HH24:MI:SS')	
+			) ptm
+------ Danh sách báo hỏng tháng 3	------------------------------------------------------------------------------------------------
+
+SELECT KV.KVC_ID,KV.TEN_KVC, KV.KHUVUC_ID, KV.MA_KV, KV.TEN_KV,kv.TEN_NV,
+							nvl(sum(bh.FIBER),0) bh_FIBER,
+							nvl(sum(bh.mega),0) bh_mega,
+							nvl(sum(bh.mytv),0) bh_mytv,
+							nvl(sum(bh.VMEET),0) bh_VMEET,
+							nvl(sum(bh.CD),0) bh_CD,
+							nvl(sum(bh.KTR),0) bh_KTR
+			FROM
+			(SELECT  kvc.khuvuc_cha_id,kv.khuvuc_id, 
+							 SUM (CASE WHEN b.loaitb_id = 58 then 1 else 0 END) fiber,
+							 SUM (CASE WHEN b.loaitb_id = 11 then 1 else 0 END) mega,
+							 SUM (CASE WHEN b.loaitb_id = 61 then 1 else 0 END) mytv,
+							 SUM (CASE WHEN b.DICHVUVT_ID = 1 then 1 else 0 END) CD,
+							 SUM (CASE WHEN b.DICHVUVT_ID = 13 then 1 else 0 END) VMEET,
+							 SUM (CASE WHEN b.DICHVUVT_ID in (8,9) then 1 else 0 END) KTR
+										FROM BAOHONG_LCI.BAOHONG a join CSS_LCI.HD_THUEBAO b on a.THUEBAO_ID = b.THUEBAO_ID
+										LEFT JOIN CSS_LCI.DBTB_KV kv on b.thuebao_id = kv.thuebao_id
+										LEFT JOIN CSS_LCI.KHUVUC kvc on kv.khuvuc_id = kvc.khuvuc_id
+										WHERE a.ttbh_id = 6
+										and a.ngay_ht >= TO_DATE('01/03/2019 00:00:00','DD/MM/YYYY HH24:MI:SS')
+										and a.ngay_ht <= TO_DATE('31/03/2019 23:59:59','DD/MM/YYYY HH24:MI:SS')	
+			GROUP BY kvc.khuvuc_cha_id,kv.khuvuc_id) bh,
+			(
+				SELECT kvc.KHUVUC_ID as kvc_id, kvc.TEN_KV as ten_kvc, kv.khuvuc_id, kv.ten_kv, kv.MA_KV ,listagg(nv.TEN_NV, ',') within group (order by nv.TEN_NV) as TEN_NV
+				FROM CSS_LCI.KHUVUC kv 
+				JOIN CSS_LCI.KHUVUC kvc on kv.khuvuc_cha_id = kvc.khuvuc_id
+				JOIN CSS_LCI.KHUVUC_NV kvnv on kv.KHUVUC_ID = kvnv.KHUVUC_ID
+				JOIN ADMIN_LCI.Nhanvien nv on kvnv.NHANVIEN_ID = nv.NHANVIEN_ID
+				WHERE kvnv.loainv_id = 51
+				AND kvnv.loaikv_id = 4
+				group by kvnv.KHUVUC_ID,kvc.KHUVUC_ID, kvc.TEN_KV, kv.khuvuc_id, kv.ten_kv, kv.MA_KV
+			) kv
+			WHERE KV.KHUVUC_ID = bh.KHUVUC_ID(+)
+			AND KV.KVC_ID = bh.khuvuc_cha_id(+)
+			GROUP BY KV.KVC_ID,KV.TEN_KVC, KV.KHUVUC_ID, KV.MA_KV, KV.TEN_KV,KV.TEN_NV
+			ORDER BY KV.KVC_ID,KV.TEN_KVC, KV.KHUVUC_ID, KV.MA_KV;
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+select thuebao_Id, MA_TB, MA_NV 
+from CSS_LCI.db_thuebao where 
+loaitb_id=58 
+and trangthaitb_id not in (7,8,9)
+union all
+		 SELECT a.thuebao_id, b.MA_TB, e.MA_NV
+		 FROM  CSS_LCI.dbtb_kv a, CSS_LCI.db_thuebao b, CSS_LCI.khuvuc_nv c, CSS_LCI.khuvuc_lkv d, admin_lci.nhanvien e
+		 WHERE   a.thuebao_id = b.thuebao_id
+					 AND a.khuvuc_id = c.khuvuc_id
+					 AND c.khuvuc_id = d.khuvuc_id
+					 AND d.loaikv_id = 4 
+					 and b.loaitb_id=58 and b.trangthaitb_id not in (7,8,9)
+					 and c.NHANVIEN_ID = e.NHANVIEN_ID
+union all
+				select a.thuebao_Id, a.MA_TB, c.ma_nv
+				from CSS_LCI.db_thuebao a, CSS_LCI.db_thanhtoan b 
+				, CSS_LCI.tuyenthu tt, admin_lci.nhanvien c
+				where a.thanhtoan_id=b.thanhtoan_id 
+				and b.tuyenthu_id=tt.tuyenthu_id(+) 
+				and tt.nhanvien_id=c.nhanvien_id(+)
+				and a.loaitb_id=58 and a.trangthaitb_id not in (7,8,9)
+
+select count(thuebao_id) tongso_tb, sum(Nvkt) nvkt, suM(nvkd) nvkd, sum(nvtc) nvtc from (
+select thuebao_id, sum(nvkt) nvkt, sum(nvkd) nvkd , sum(nvtc) nvtc from (
+select thuebao_Id, 0 nvkt, 0 nvkd, 0 nvtc from db_thuebao where loaitb_id=58 
+ and trangthaitb_id not in (7,8,9)
+union all
+SELECT   a.thuebao_id, case when sum (case when c.loainv_id=51 then 1 else 0 end)>=1 then 1 else 0 end nvkt,
+case when sum (case when c.loainv_id=52 then 1 else 0 end)>=1 then 1 else 0 end  nvkd,0 nvtc
+               FROM   dbtb_kv a, db_thuebao b, khuvuc_nv c, khuvuc_lkv d
+               WHERE   a.thuebao_id = b.thuebao_id
+                     AND a.khuvuc_id = c.khuvuc_id
+                     AND c.khuvuc_id = d.khuvuc_id
+                     AND d.loaikv_id = 4 
+                     and b.loaitb_id=58 and b.trangthaitb_id not in (7,8,9)
+                     group by a.thuebao_id
+union all
+select a.thuebao_Id, 0, 0, (case when c.nhanvien_id is not null then 1 else 0 end) from db_thuebao a, db_thanhtoan b 
+, tuyenthu tt, admin_lci.nhanvien c
+where a.thanhtoan_id=b.thanhtoan_id and b.tuyenthu_id=tt.tuyenthu_id(+) and tt.nhanvien_id=c.nhanvien_id(+)
+and a.loaitb_id=58 and a.trangthaitb_id not in (7,8,9)                    
+)  group by thuebao_Id   
+)
+----------------Check tk chua map tren CCBS-----------------------------------------------------------------------------
+select nguoigach from 
+css_lci.lci_bangphieutras where trunc(ngay_tt)>=to_date('01/05/2019','dd/MM/yyyy')
+and  trunc(ngay_tt)<=to_date('31/05/2019','dd/MM/yyyy') and nguoigach <> 'ccbs_vnp'
+minus
+select user_vnp from admin_lci.nguoidung_vnp where dongbo=1
+----------------Check gach no chua map tren CCBS--------------------------------------------------------------
+-- CHECK số liệu lệch giữa vnp và tỉnh
+select a.ma_tb,tinh,vnp from
+(select ma_tb,sum(tragoc + trathue - chihoahong) tinh from qltn_lci.BANGPHIEUTRA_01042019 a,qltn_lci.CT_TRA_01042019 b
+where a.phieu_id = b.phieu_id and dichvuvt_id =2 and a.phieu_id_neo is not null group by ma_tb ) a,
+(select substr(somay,3,length(somay -2)) ma_tb,sum(tientra) vnp from BAOCAO_LCI."TRA_Thang42019" where nguoigach<>'ccbs_vnp' 
+group by substr(somay,3,LENGTH(somay -2))) b
+where a.ma_tb = b.ma_tb(+) and nvl(tinh ,0) <> nvl(vnp,0);
+
+--Check số liệu lệch giữa PTTB so với NEO CCBS 
+select a.ma_tb,vnp,tinh from
+(select substr(somay,3,length(somay -2)) ma_tb,sum(tientra) vnp from BAOCAO_LCI."TRA_Thang42019" where nguoigach<>'ccbs_vnp' 
+group by substr(somay,3,LENGTH(somay -2))) a,
+(select ma_tb,sum(tragoc + trathue - chihoahong) tinh from qltn_lci.BANGPHIEUTRA_01042019 a,qltn_lci.CT_TRA_01042019 b
+where a.phieu_id = b.phieu_id and dichvuvt_id =2 and a.phieu_id_neo is not null group by ma_tb ) b
+where a.ma_tb = b.ma_tb(+) and nvl(vnp ,0) <> nvl(tinh,0)
+
+
+
+
+
+											

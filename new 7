@@ -1,0 +1,70 @@
+ select DV.ten_dv,TT.DONVI_ID as pbh_id, a.ma_tb,TB.LOAITB_ID,tb.ten_tb, tb.diachi_ld, tb.ngay_sd,  a.thang_bd, a.thang_kt,   
+ (MONTHS_BETWEEN((TO_DATE(a.thang_kt, 'yyyy/MM')),(TO_DATE(a.thang_bd, 'yyyy/MM'))) + 1) As SOTHANG,  
+  ctkm.khuyenmai_id, ctkm.chitietkm_id, a.cuoc_dc, a.tien_td, a.thang_huy,   
+  a.thang_kt_dc, a.ngay_dk, a.NGUOI_CN,  
+	Case when TO_DATE(TO_CHAR(SYSDATE,'yyyy/MM'),'yyyy/MM') >= TO_DATE(a.thang_bd, 'yyyy/MM') and thang_kt_dc is null then  
+(MONTHS_BETWEEN((TO_DATE(a.thang_kt, 'yyyy/MM')),TO_DATE(TO_CHAR(SYSDATE,'yyyy/MM'),'yyyy/MM')) + 1)   
+ When TO_DATE(TO_CHAR(SYSDATE,'yyyy/MM'),'yyyy/MM') < TO_DATE(a.thang_bd, 'yyyy/MM') and thang_kt_dc is null then  
+	(MONTHS_BETWEEN((TO_DATE(a.thang_kt, 'yyyy/MM')),(TO_DATE(a.thang_bd, 'yyyy/MM'))) + 1) else 0  
+ End SOTHANGCONLAI,pt.CTV_ID, pt.MA_NV Ma_CTV, pt.TEN_NV Ten_CTV  
+ From CSS_LCI.db_datcoc a, CSS_LCI.ct_khuyenmai ctkm, CSS_LCI.DB_THUEBAO tb, ADMIN_LCI.donvi dv, CSS_LCI.DB_THANHTOAN tt,  
+ (select a.thuebao_id, a.ma_tb, b.ctv_id , c.ma_nv, c.ten_nv  
+ from CSS_LCI.hd_thuebao a, CSS_LCI.hd_khachhang b ,admin_lci.nhanvien c  
+	where a.hdkh_id = b.hdkh_id(+)  
+	and b.ctv_id = c.nhanvien_id  
+ and a.tthd_id = 6  
+ and b.loaihd_id = 31  
+ and a.kieuld_id in (select kieuld_id  from css_lci.kieu_ld where loaihd_id = 31)) pt  
+ Where (hieuluc = 1 or hieuluc is null or (hieuluc = 0 and thang_huy >= to_char(''|| vngay_bd || ', 'yyyyMM') and thang_huy <= to_char(''|| vngay_kt || ', 'yyyyMM')))  
+	And a.thuebao_id = TB.thuebao_id(+)  
+	And a.thuebao_id = pt.thuebao_id(+)  
+	And tb.THANHTOAN_ID = TT.THANHTOAN_ID  
+	and tb.DONVI_ID = DV.DONVI_ID  
+ and a.thang_bd <> 0 
+ and (ttdc_id = 0 or ttdc_id is null or (ttdc_id = 1 and thang_kt_dc >= to_char(''|| vngay_bd || ', 'yyyyMM') and thang_kt_dc <= to_char(''|| vngay_kt || ', 'yyyyMM')))  
+ and a.chitietkm_id = ctkm.chitietkm_id (+)  
+ AND A.NGAY_CN >= TO_DATE(''|| vngay_bd ||' 00:00:00','DD/MM/YYYY HH24:MI:SS') 
+ AND A.NGAY_CN <= TO_DATE(''|| vngay_kt ||' 23:59:59','DD/MM/YYYY HH24:MI:SS') 
+ union   
+ select DV.ten_dv,TT.DONVI_ID as pbh_id, tb.ma_tb,TB.LOAITB_ID,tb.ten_tb, tb.diachi_ld, tb.ngay_sd, a.thang_bddc, a.thang_ktdc,  
+ (MONTHS_BETWEEN((TO_DATE(a.thang_ktdc, 'yyyy/MM')),(TO_DATE(a.thang_bddc, 'yyyy/MM'))) + 1) As SOTHANG,  
+	a.khuyenmai_id, a.chitietkm_id, a.datcoc_csd, a.tien_td, a.thang_huy,  
+ a.thang_kt_dc, (select hd.ngay_ht  
+ from CSS_LCI.khuyenmai_hdtb kmhd, CSS_LCI.hd_thuebao hd  
+ where kmhd.hdtb_id = hd.hdtb_id  
+ and kmhd.kieu_yc = 1  
+ and kmhd.khuyenmai_id= km.khuyenmai_id  
+ and kmhd.chitietkm_id = b.chitietkm_id  
+ and hd.thuebao_id = a.thuebao_id) ngay_dk,  
+	(select hd.NGUOI_CN  
+ from CSS_LCI.khuyenmai_hdtb kmhd, CSS_LCI.hd_thuebao hd  
+ where kmhd.hdtb_id = hd.hdtb_id  
+ and kmhd.kieu_yc = 1  
+ and kmhd.khuyenmai_id= km.khuyenmai_id  
+ and kmhd.chitietkm_id = b.chitietkm_id  
+ and hd.thuebao_id = a.thuebao_id) NGUOI_CN,  
+ case when TO_DATE(TO_CHAR(SYSDATE,'yyyy/MM'),'yyyy/MM') >= TO_DATE(a.thang_bddc, 'yyyy/MM') and thang_kt_dc is null then  
+ (MONTHS_BETWEEN((TO_DATE(a.thang_ktdc, 'yyyy/MM')),TO_DATE(TO_CHAR(SYSDATE,'yyyy/MM'),'yyyy/MM')) + 1)  
+ when TO_DATE(TO_CHAR(SYSDATE,'yyyy/MM'),'yyyy/MM') < TO_DATE(a.thang_bddc, 'yyyy/MM') and thang_kt_dc is null then  
+ (MONTHS_BETWEEN((TO_DATE(a.thang_ktdc, 'yyyy/MM')),(TO_DATE(a.thang_bddc, 'yyyy/MM'))) + 1)  
+ else 0  
+ end SOTHANGCONLAI,pt.CTV_ID, pt.MA_NV Ma_CTV, pt.TEN_NV Ten_CTV  
+ from CSS_LCI.khuyenmai_dbtb a, CSS_LCI.db_thuebao tb, CSS_LCI.ct_khuyenmai b, CSS_LCI.khuyenmai km,ADMIN_LCI.donvi dv,CSS_LCI.DB_THANHTOAN tt,  
+ (select a.thuebao_id, a.ma_tb, b.ctv_id , c.ma_nv, c.ten_nv  
+ from CSS_LCI.hd_thuebao a, CSS_LCI.hd_khachhang b ,admin_lci.nhanvien c  
+ where a.hdkh_id = b.hdkh_id  
+ and b.ctv_id = c.nhanvien_id  
+ and a.tthd_id = 6  
+ and b.loaihd_id = 31  
+ and a.kieuld_id in (select kieuld_id  from css_lci.kieu_ld where loaihd_id = 31))pt  
+ where a.chitietkm_id = b.chitietkm_id  
+ and tb.THANHTOAN_ID = TT.THANHTOAN_ID  
+ and tb.DONVI_ID = DV.DONVI_ID  
+ and (hieuluc = 1 or hieuluc is null or (hieuluc = 0 and thang_huy >= to_char(''|| vngay_bd || ', 'yyyyMM') and thang_huy <= to_char(''|| vngay_kt || ', 'yyyyMM'))) 
+ and (ttdc_id = 0 or ttdc_id is null or (ttdc_id = 1 and thang_kt_dc >= to_char(''|| vngay_bd || ', 'yyyyMM') and thang_kt_dc <= to_char(''|| vngay_kt || ', 'yyyyMM'))) 
+	AND a.Ngay_SD >= TO_DATE(''|| vngay_bd ||' 00:00:00','DD/MM/YYYY HH24:MI:SS')  
+ AND a.Ngay_SD <= TO_DATE(''|| vngay_kt ||' 23:59:59','DD/MM/YYYY HH24:MI:SS')  
+ and a.thuebao_id = tb.thuebao_id(+) 
+ and a.thuebao_id = pt.thuebao_id(+) 
+ and a.khuyenmai_id = km.khuyenmai_id 
+ and km.loai_km = 1 

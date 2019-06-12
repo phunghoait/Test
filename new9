@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 select count(*) as Tong_PSC_CoDinh,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV ,a7.TEN_NV
 from bcss_lci.ct_no_20190301 a,tinhcuoc_lci.dbtb_20190301 a3, CSS_LCI.LOAIHINH_TB a1, 
 ADMIN_LCI.DONVI a2, tinhcuoc_lci.dbtb_kv_20190301 a4, CSS_LCI.KHUVUC a5, CSS_LCI.KHUVUC_NV a6, ADMIN_LCI.NHANVIEN a7
@@ -13,7 +12,6 @@ and a.LOAITB_ID = 1
 and a6.loainv_id = 51
 and a6.loaikv_id = 4
 GROUP BY A4.KHUVUC_ID, a.DONVI_QL_ID,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV, a7.TEN_NV
-=======
 select count(*) as Tong_PSC_CoDinh,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV ,a7.TEN_NV
 from bcss_lci.ct_no_20190301 a,tinhcuoc_lci.dbtb_20190301 a3, CSS_LCI.LOAIHINH_TB a1, 
 ADMIN_LCI.DONVI a2, tinhcuoc_lci.dbtb_kv_20190301 a4, CSS_LCI.KHUVUC a5, CSS_LCI.KHUVUC_NV a6, ADMIN_LCI.NHANVIEN a7
@@ -28,5 +26,184 @@ and a.LOAITB_ID = 1
 and a6.loainv_id = 51
 and a6.loaikv_id = 4
 GROUP BY A4.KHUVUC_ID, a.DONVI_QL_ID,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV, a7.TEN_NV
->>>>>>> 25d413a... Add files via upload
 ORDER BY A5.TEN_KV 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+dotnet run
+dotnet nuget locals all --clear
+nuget locals all -clear
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1. LCI_ Tổng hợp báo hỏng nhiều lần
+2. LCI_ Báo Cáo tổng hợp máy hỏng theo nguyên nhân theo ngày
+----------------------------Báo hỏng----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+select count(*) as Tong_PTM_CoDinh,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV ,a7.TEN_NV
+from BAOHONG_LCI.baohong a,tinhcuoc_lci.dbtb_20190101 a3, CSS_LCI.LOAIHINH_TB a1, 
+ADMIN_LCI.DONVI a2, tinhcuoc_lci.dbtb_kv_20190101 a4, CSS_LCI.KHUVUC a5, CSS_LCI.KHUVUC_NV a6, ADMIN_LCI.NHANVIEN a7
+where a.THUEBAO_ID = A3.THUEBAO_ID
+and a.LOAITB_ID = a1.loaitb_id
+AND a7.DONVI_ID = A2.DONVI_ID
+and A3.THUEBAO_ID = A4.THUEBAO_ID
+and a4.khuvuc_id = a5.khuvuc_id
+and A4.KHUVUC_ID = A6.KHUVUC_ID
+and A6.NHANVIEN_ID = A7.NHANVIEN_ID
+and a.LOAITB_ID = 1
+and a6.loainv_id = 51
+and a6.loaikv_id = 4
+and a.NGAY_HT >= TO_DATE('01/01/2019 00:00:00', 'dd/MM/yyyy HH24:MI:SS')
+and a.NGAY_HT <= TO_DATE('31/01/2019 23:59:59', 'dd/MM/yyyy HH24:MI:SS')
+GROUP BY A4.KHUVUC_ID, a.DONVI_ID,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV, a7.TEN_NV
+ORDER BY A4.KHUVUC_ID;
+select count(*) as Tong_PTM_CoDinh,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV ,a7.TEN_NV
+from BAOHONG_LCI.baohong a,tinhcuoc_lci.dbtb_20190201 a3, CSS_LCI.LOAIHINH_TB a1, 
+ADMIN_LCI.DONVI a2, tinhcuoc_lci.dbtb_kv_20190201 a4, CSS_LCI.KHUVUC a5, CSS_LCI.KHUVUC_NV a6, ADMIN_LCI.NHANVIEN a7
+where a.THUEBAO_ID = A3.THUEBAO_ID
+and a.LOAITB_ID = a1.loaitb_id
+AND a7.DONVI_ID = A2.DONVI_ID
+and A3.THUEBAO_ID = A4.THUEBAO_ID
+and a4.khuvuc_id = a5.khuvuc_id
+and A4.KHUVUC_ID = A6.KHUVUC_ID
+and A6.NHANVIEN_ID = A7.NHANVIEN_ID
+and a.LOAITB_ID = 1
+and a6.loainv_id = 51
+and a6.loaikv_id = 4
+and a.NGAY_HT >= TO_DATE('01/02/2019 00:00:00', 'dd/MM/yyyy HH24:MI:SS')
+and a.NGAY_HT <= TO_DATE('28/02/2019 23:59:59', 'dd/MM/yyyy HH24:MI:SS')
+GROUP BY A4.KHUVUC_ID, a.DONVI_ID,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV, a7.TEN_NV
+ORDER BY A4.KHUVUC_ID;
+select count(*) as Tong_PTM_CoDinh,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV ,a7.TEN_NV
+from BAOHONG_LCI.baohong a,tinhcuoc_lci.dbtb_20190301 a3, CSS_LCI.LOAIHINH_TB a1, 
+ADMIN_LCI.DONVI a2, tinhcuoc_lci.dbtb_kv_20190301 a4, CSS_LCI.KHUVUC a5, CSS_LCI.KHUVUC_NV a6, ADMIN_LCI.NHANVIEN a7
+where a.THUEBAO_ID = A3.THUEBAO_ID
+and a.LOAITB_ID = a1.loaitb_id
+AND a7.DONVI_ID = A2.DONVI_ID
+and A3.THUEBAO_ID = A4.THUEBAO_ID
+and a4.khuvuc_id = a5.khuvuc_id
+and A4.KHUVUC_ID = A6.KHUVUC_ID
+and A6.NHANVIEN_ID = A7.NHANVIEN_ID
+and a.LOAITB_ID = 1
+and a6.loainv_id = 51
+and a6.loaikv_id = 4
+and a.NGAY_HT >= TO_DATE('01/03/2019 00:00:00', 'dd/MM/yyyy HH24:MI:SS')
+and a.NGAY_HT <= TO_DATE('31/03/2019 23:59:59', 'dd/MM/yyyy HH24:MI:SS')
+GROUP BY A4.KHUVUC_ID, a.DONVI_ID,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV, a7.TEN_NV
+ORDER BY A4.KHUVUC_ID;
+
+
+select count(*) as Tong_PTM_CoDinh,A1.LOAIHINH_TB, A8.TEN_DV, A5.TEN_KV ,a7.TEN_NV
+from BAOHONG_LCI.baohong a,tinhcuoc_lci.dbtb_20190101 a3, CSS_LCI.LOAIHINH_TB a1, 
+ADMIN_LCI.DONVI a2, tinhcuoc_lci.dbtb_kv_20190101 a4, CSS_LCI.KHUVUC a5, CSS_LCI.KHUVUC_NV a6, ADMIN_LCI.NHANVIEN a7, ADMIN_LCI.DONVI a8
+where a.THUEBAO_ID = A3.THUEBAO_ID
+and a.LOAITB_ID = a1.loaitb_id
+AND a7.DONVI_ID = A2.DONVI_ID
+AND A2.DONVI_CHA_ID = A8.DONVI_ID
+and A3.THUEBAO_ID = A4.THUEBAO_ID
+and a4.khuvuc_id = a5.khuvuc_id
+and A4.KHUVUC_ID = A6.KHUVUC_ID
+and A6.NHANVIEN_ID = A7.NHANVIEN_ID
+and a.LOAITB_ID = 1
+and a6.loainv_id = 51
+and a6.loaikv_id = 4
+and a.NGAY_HT >= TO_DATE('01/01/2019 00:00:00', 'dd/MM/yyyy HH24:MI:SS')
+and a.NGAY_HT <= TO_DATE('31/01/2019 23:59:59', 'dd/MM/yyyy HH24:MI:SS')
+GROUP BY A4.KHUVUC_ID, a.DONVI_ID,A1.LOAIHINH_TB, A8.TEN_DV, A5.TEN_KV, a7.TEN_NV
+ORDER BY A4.KHUVUC_ID;
+----------------------------Lắp đặt mới----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+select count(*) as Tong_PTM_CoDinh,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV ,a7.TEN_NV
+from CSS_LCI.HD_THUEBAO a,tinhcuoc_lci.dbtb_20190101 a3, CSS_LCI.LOAIHINH_TB a1, 
+ADMIN_LCI.DONVI a2, tinhcuoc_lci.dbtb_kv_20190101 a4, CSS_LCI.KHUVUC a5, CSS_LCI.KHUVUC_NV a6, ADMIN_LCI.NHANVIEN a7
+where a.THUEBAO_ID = A3.THUEBAO_ID
+and a.LOAITB_ID = a1.loaitb_id
+AND a.DONVI_ID = A2.DONVI_ID
+and A3.THUEBAO_ID = A4.THUEBAO_ID
+and a4.khuvuc_id = a5.khuvuc_id
+and A4.KHUVUC_ID = A6.KHUVUC_ID
+and A6.NHANVIEN_ID = A7.NHANVIEN_ID
+and a.LOAITB_ID = 58
+and a6.loainv_id = 51
+and a6.loaikv_id = 4
+and a.NGAY_HT >= TO_DATE('01/01/2019 00:00:00', 'dd/MM/yyyy HH24:MI:SS')
+and a.NGAY_HT <= TO_DATE('31/01/2019 23:59:59', 'dd/MM/yyyy HH24:MI:SS')
+GROUP BY A4.KHUVUC_ID, a.DONVI_ID,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV, a7.TEN_NV
+ORDER BY A4.KHUVUC_ID;
+select * from tinhcuoc_lci.dbtb_20190101 a3 where ROWNUM < 10
+select count(*) as Tong_PSC_CoDinh,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV ,a7.TEN_NV
+from CSS_LCI.HD_THUEBAO a,tinhcuoc_lci.dbtb_20190201 a3, CSS_LCI.LOAIHINH_TB a1, 
+ADMIN_LCI.DONVI a2, tinhcuoc_lci.dbtb_kv_20190201 a4, CSS_LCI.KHUVUC a5, CSS_LCI.KHUVUC_NV a6, ADMIN_LCI.NHANVIEN a7
+where a.MA_TB = A3.MA_TB
+and a.LOAITB_ID = a1.loaitb_id
+AND a.DONVI_ID = A2.DONVI_ID
+and A3.THUEBAO_ID = A4.THUEBAO_ID
+and a4.khuvuc_id = a5.khuvuc_id
+and A4.KHUVUC_ID = A6.KHUVUC_ID
+and A6.NHANVIEN_ID = A7.NHANVIEN_ID
+and a.LOAITB_ID = 58
+and a.tthd_id = 6
+and a6.loainv_id = 51
+and a6.loaikv_id = 4
+and a.NGAY_ins >= TO_DATE('01/02/2019 00:00:00', 'dd/MM/yyyy HH24:MI:SS')
+and a.NGAY_ins <= TO_DATE('28/02/2019 23:59:59', 'dd/MM/yyyy HH24:MI:SS')
+GROUP BY A4.KHUVUC_ID, a.DONVI_ID,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV, a7.TEN_NV
+ORDER BY A4.KHUVUC_ID;
+select count(*) as Tong_PSC_CoDinh,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV ,a7.TEN_NV
+from CSS_LCI.HD_THUEBAO a,tinhcuoc_lci.dbtb_20190301 a3, CSS_LCI.LOAIHINH_TB a1, 
+ADMIN_LCI.DONVI a2, tinhcuoc_lci.dbtb_kv_20190301 a4, CSS_LCI.KHUVUC a5, CSS_LCI.KHUVUC_NV a6, ADMIN_LCI.NHANVIEN a7
+where a.MA_TB = A3.MA_TB
+and a.LOAITB_ID = a1.loaitb_id
+AND a.DONVI_ID = A2.DONVI_ID
+and A3.THUEBAO_ID = A4.THUEBAO_ID
+and a4.khuvuc_id = a5.khuvuc_id
+and A4.KHUVUC_ID = A6.KHUVUC_ID
+and A6.NHANVIEN_ID = A7.NHANVIEN_ID
+and a.LOAITB_ID = 58
+and a.tthd_id = 6
+and a6.loainv_id = 51
+and a6.loaikv_id = 4
+and a.NGAY_ins >= TO_DATE('01/03/2019 00:00:00', 'dd/MM/yyyy HH24:MI:SS')
+and a.NGAY_ins <= TO_DATE('31/03/2019 23:59:59', 'dd/MM/yyyy HH24:MI:SS')
+GROUP BY A4.KHUVUC_ID, a.DONVI_ID,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV, a7.TEN_NV
+ORDER BY A4.KHUVUC_ID;
+----------------------------Phát sinh cước----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+select count(*) as Tong_PSC_CoDinh,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV ,a7.TEN_NV
+from bcss_lci.ct_no_20190201 a,tinhcuoc_lci.dbtb_20190201 a3, CSS_LCI.LOAIHINH_TB a1, 
+ADMIN_LCI.DONVI a2, tinhcuoc_lci.dbtb_kv_20190201 a4, CSS_LCI.KHUVUC a5, CSS_LCI.KHUVUC_NV a6, ADMIN_LCI.NHANVIEN a7
+where a.MA_TB = A3.MA_TB
+and a.LOAITB_ID = a1.loaitb_id
+AND a.DONVI_QL_ID = A2.DONVI_ID
+and A3.THUEBAO_ID = A4.THUEBAO_ID
+and a4.khuvuc_id = a5.khuvuc_id
+and A4.KHUVUC_ID = A6.KHUVUC_ID
+and A6.NHANVIEN_ID = A7.NHANVIEN_ID
+and a.LOAITB_ID = 61
+and a6.loainv_id = 51
+and a6.loaikv_id = 4
+GROUP BY A4.KHUVUC_ID, a.DONVI_QL_ID,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV, a7.TEN_NV
+ORDER BY A4.KHUVUC_ID;
+select count(*) as Tong_PSC_CoDinh,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV ,a7.TEN_NV
+from bcss_lci.ct_no_20190201 a,tinhcuoc_lci.dbtb_20190201 a3, CSS_LCI.LOAIHINH_TB a1, 
+ADMIN_LCI.DONVI a2, tinhcuoc_lci.dbtb_kv_20190201 a4, CSS_LCI.KHUVUC a5, CSS_LCI.KHUVUC_NV a6, ADMIN_LCI.NHANVIEN a7
+where a.MA_TB = A3.MA_TB
+and a.LOAITB_ID = a1.loaitb_id
+AND a.DONVI_QL_ID = A2.DONVI_ID
+and A3.THUEBAO_ID = A4.THUEBAO_ID
+and a4.khuvuc_id = a5.khuvuc_id
+and A4.KHUVUC_ID = A6.KHUVUC_ID
+and A6.NHANVIEN_ID = A7.NHANVIEN_ID
+and a.LOAITB_ID = 61
+and a6.loainv_id = 51
+and a6.loaikv_id = 4
+GROUP BY A4.KHUVUC_ID, a.DONVI_QL_ID,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV, a7.TEN_NV
+ORDER BY A4.KHUVUC_ID;
+select count(*) as Tong_PSC_CoDinh,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV ,a7.TEN_NV
+from bcss_lci.ct_no_20190201 a,tinhcuoc_lci.dbtb_20190201 a3, CSS_LCI.LOAIHINH_TB a1, 
+ADMIN_LCI.DONVI a2, tinhcuoc_lci.dbtb_kv_20190201 a4, CSS_LCI.KHUVUC a5, CSS_LCI.KHUVUC_NV a6, ADMIN_LCI.NHANVIEN a7
+where a.MA_TB = A3.MA_TB
+and a.LOAITB_ID = a1.loaitb_id
+AND a.DONVI_QL_ID = A2.DONVI_ID
+and A3.THUEBAO_ID = A4.THUEBAO_ID
+and a4.khuvuc_id = a5.khuvuc_id
+and A4.KHUVUC_ID = A6.KHUVUC_ID
+and A6.NHANVIEN_ID = A7.NHANVIEN_ID
+and a.LOAITB_ID = 61
+and a6.loainv_id = 51
+and a6.loaikv_id = 4
+GROUP BY A4.KHUVUC_ID, a.DONVI_QL_ID,A1.LOAIHINH_TB, A2.TEN_DV, A5.TEN_KV, a7.TEN_NV
+ORDER BY A4.KHUVUC_ID;
